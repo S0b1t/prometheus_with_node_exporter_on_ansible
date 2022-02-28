@@ -1,0 +1,10 @@
+---
+# vars file for node_exporter
+wget_directory: "/tmp/project"
+wget_node_exporter: "https://github.com/prometheus/node_exporter/releases/download/v1.1.0/node_exporter-1.1.0.linux-amd64.tar.gz"
+node_exporter_tar: "node_exporter-1.1.0.linux-amd64.tar.gz"
+node_exporter_move: "node_exporter-1.1.0.linux-amd64/node_exporter"
+node_exporter_remove: node_exporter-1.1.0.linux-amd64*
+user: "node_exporter"
+bin: "/usr/local/bin/"
+daemon_node_exporter: "node_exporter.service"

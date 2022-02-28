@@ -1,0 +1,90 @@
+---
+# tasks file for prometheus
+- name: Create dir
+  file:
+    path: "{{ wget_directory }}"
+    state: directory
+    mode: 0775
+    
+#install and configure prometheus
+- name: download prometheus file
+  get_url:
+    url: "{{ wget_prometheus }}"
+    dest: "{{ wget_directory }}"
+
+- name: Extarct prometheus-2.1.0.linux-amd64.tar.gz file
+  unarchive:
+    src: "{{ wget_directory }}/{{ prometheus_tar }}"
+    dest: "{{ wget_directory }}"
+    remote_src: yes
+
+- name: Move "{{ prometheus_move1 }}"
+  copy:
+    src: "{{ wget_directory }}/{{ prometheus_move1 }}"
+    dest: "{{ bin }}"
+    remote_src: yes
+
+- name: Move "{{ prometheus_move4 }}"
+  copy:
+    src: "{{ wget_directory }}/{{ prometheus_move4 }}"
+    dest: "{{ bin }}"
+    remote_src: yes
+
+
+- name: Create "{{ etc }}" directory
+  file:
+    path: "{{ etc }}"
+    state: directory
+
+- name: Create "{{ var }}" directory
+  file: 
+    path: "{{ var }}"
+    state: directory
+
+- name: Move "{{ prometheus_move2 }}"
+  copy:
+    src: "{{ wget_directory }}/{{ prometheus_move2 }}"
+    dest: "{{ etc }}"
+    remote_src: yes
+
+- name: Move "{{ prometheus_move3 }}"
+  copy:
+    src: "{{ wget_directory }}/{{ prometheus_move3 }}"
+    dest: "{{ etc }}"
+    remote_src: yes
+
+- name: Remove "{{ prometheus_remove }}"
+  shell: "rm -rf {{ wget_directory }}/{{ prometheus_remove }}"
+
+ 
+
+- name: Copy prometheus.yml.j2
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ etc }}/prometheus.yml"
+
+- name: Useradd
+  user:
+    name: "{{ user1 }}"
+    shell: /bin/false
+
+- name: Change file ownership
+  file:
+    path: "{{ item }}"
+    owner: "{{ user1 }}"
+  with_items:
+    - "{{ etc }}"
+    - "{{ var }}"
+
+- name: Change file permission
+  file:
+    path: /usr/local/bin/prometheus
+    mode: '0775'
+
+- name: Set up daemon for prometheus
+  template:
+    src: "prometheus.service.j2"
+    dest: "/etc/systemd/system/prometheus.service"
+  notify:
+    - reload daemon
+    - start prometheus

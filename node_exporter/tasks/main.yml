@@ -1,0 +1,47 @@
+---
+# tasks file for node_exporter
+#install and configure node_exporter
+- name: Create project directory
+  file:
+    path: "{{ wget_directory }}"
+    state: directory
+
+- name: download node_exporter file
+  get_url:
+    url: "{{ wget_node_exporter }}"
+    dest: "{{ wget_directory }}"
+
+- name: Extract node_exporter-0.15.2.linux-amd64.tar.gz file
+  unarchive:
+    src: "{{ wget_directory }}/{{ node_exporter_tar }}"
+    dest: "{{ wget_directory }}"
+    remote_src: yes
+
+
+- name: Move "{{ node_exporter_move }}" into /usr/local/bin
+  copy:
+    src: "{{ wget_directory }}/{{ node_exporter_move }}"
+    dest: "{{ bin }}"
+    remote_src: yes
+
+- name: Remove node_exporter-0.15.2.linux-amd64.tar.gz
+  shell: "rm -rf {{ wget_directory }}/{{ node_exporter_remove }}"
+
+- name: Change file permission
+  file:
+    path: /usr/local/bin/node_exporter
+    mode: '0755'
+
+- name: Add user "{{ user }}"
+  user:
+    name: "{{ user }}"
+    shell: /bin/false
+
+- name: Copy daemon "{{ user }}"
+  template:
+    src: "node_exporter.service.j2"
+    dest: "/etc/systemd/system/{{ daemon_node_exporter }}"
+  notify:
+    - reload daemon
+    - start node_exporter
+

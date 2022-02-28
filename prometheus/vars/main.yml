@@ -1,0 +1,14 @@
+---
+# vars file for prometheus
+wget_directory: "/tmp/project"
+user1: "prometheus"
+wget_prometheus: "https://github.com/prometheus/prometheus/releases/download/v2.15.2/prometheus-2.15.2.linux-amd64.tar.gz"
+prometheus_tar: "prometheus-2.15.2.linux-amd64.tar.gz"
+prometheus_move1: "prometheus-2.15.2.linux-amd64/prometheus" 
+prometheus_move4: "prometheus-2.15.2.linux-amd64/promtool"
+prometheus_move2: "prometheus-2.15.2.linux-amd64/consoles"
+prometheus_move3: "prometheus-2.15.2.linux-amd64/console_libraries"
+prometheus_remove: prometheus-2.15.2.linux-amd64*
+bin: "/usr/local/bin/"
+etc: "/etc/prometheus/"
+var: "/var/lib/prometheus/"

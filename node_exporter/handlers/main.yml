@@ -1,0 +1,10 @@
+---
+# handlers file for node_exporter
+- name: reload daemon
+  shell: "systemctl daemon-reload"
+
+- name: start node_exporter
+  service:
+    name: node_exporter
+    enabled: yes
+    state: started
