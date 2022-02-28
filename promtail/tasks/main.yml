@@ -1,0 +1,64 @@
+---
+# tasks file for promtail
+---
+- name: Install gnupg2 curl 
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  loop:
+    - gnupg2
+    - curl
+    - unzip
+
+- name: Create /tmp/promtail
+  file:
+    path: "{{ URL_PROMTAIL_DIR }}"
+    state: directory
+
+- name: Download promtail agent
+  get_url:
+    url: "{{ URL_PROMTAIL }}"
+    dest: "{{ URL_PROMTAIL_DIR }}"
+
+- name: Unarchive "{{ ZIP_PROMTAIL }}"
+  unarchive:
+    src: "{{ URL_PROMTAIL_DIR }}/{{ ZIP_PROMTAIL }}"
+    dest: "{{ URL_PROMTAIL_DIR }}"
+    remote_src: yes
+
+- name: Move "{{ PROMTAIL_AGENT }}"
+  copy:
+    src: "{{ URL_PROMTAIL_DIR }}/{{ PROMTAIL_AGENT }}"
+    dest: "{{ bin }}/promtail"
+    remote_src: yes
+
+- name: Remove "{{ ZIP_PROMTAIL }}"
+  shell: "rm -rf {{ URL_PROMTAIL_DIR }}/{{ ZIP_PROMTAIL }}"
+
+- name: Change permission "{{ bin }}/promtail to 755"
+  file:
+    path: "{{ bin }}/promtail"
+    mode: '0755'
+
+- name: Create directory "{{ PROMTAIL_CONFIG_DIR }}"
+  file:
+    path: "{{ PROMTAIL_CONFIG_DIR }}"
+    state: directory
+
+- name: Create directory "{{ PROMTAIL_CONFIG_DIR2 }}"
+  file:
+    path: "{{ PROMTAIL_CONFIG_DIR2 }}"
+    state: directory
+
+- name: Copy Promtail agent Configuration
+  template:
+    src: "config.yaml.j2"
+    dest: "{{ PROMTAIL_CONFIG_DIR }}/config.yaml"
+
+- name: Copy Promtail daemon to "{{ PROMTAIL_DAEMON_DIR }}"
+  template:
+    src: "promtail.service.j2"
+    dest: "{{ PROMTAIL_DAEMON_DIR }}/promtail.service"
+  notify:
+    - reload daemon
+    - start promtail
