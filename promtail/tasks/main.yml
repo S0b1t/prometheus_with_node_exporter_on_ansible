@@ -1,6 +1,5 @@
 ---
 # tasks file for promtail
----
 - name: Install gnupg2 curl 
   apt:
     name: "{{ item }}"
